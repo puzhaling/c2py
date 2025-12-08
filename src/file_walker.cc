@@ -6,7 +6,7 @@ FileWalker::FileWalker (char const *filename)
 }
 
 bool
-FileWalker::is_open () const
+FileWalker::is_file_opened () const
 {
 	return _fs.is_open ();
 }

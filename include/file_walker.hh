@@ -7,7 +7,7 @@ class FileWalker {
 public:
 	FileWalker (char const *filename);
 
-	bool is_open () const;
+	bool is_file_opened () const;
 	int get_next_char ();
 
 private:
