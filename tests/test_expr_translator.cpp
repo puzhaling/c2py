@@ -6,11 +6,6 @@
 #include	<string>
 
 
-static ExpressionTranslator e;
-static std::vector<Token> toks = {
-	Token{ TokenType::Unknown, "", 0, 0 }
-};
-
 static
 std::string strip (const std::string &instring)
 {
@@ -33,7 +28,11 @@ TEST_GROUP (expr_translator_test_group)
 
 TEST (expr_translator_test_group, test_map_operators)
 {
-	toks[0] = Token{ TokenType::Operator, "&&", 0, 0 };
+	ExpressionTranslator e;
+	std::vector<Token> toks = {
+		{ TokenType::Operator, "&&", 0, 0 }
+	};
+
 	STRCMP_EQUAL ("and", strip(e.translate(toks)).c_str());
 
 	toks[0].lexeme = "||";
@@ -48,7 +47,11 @@ TEST (expr_translator_test_group, test_map_operators)
 
 TEST (expr_translator_test_group, test_translate_inc_dec)
 {
-	toks[0] = Token{ TokenType::Operator, "++", 0, 0 };
+	ExpressionTranslator e;
+	std::vector<Token> toks = {
+		{ TokenType::Operator, "++", 0, 0 }
+	};
+
 	STRCMP_EQUAL ("+= 1", strip(e.translate(toks)).c_str());
 
 	toks[0].lexeme = "--";
@@ -57,7 +60,11 @@ TEST (expr_translator_test_group, test_translate_inc_dec)
 
 TEST (expr_translator_test_group, test_translate_left_lexeme_untouched)
 {
-	toks[0] = Token{ TokenType::Unknown, "DONT_CHANGE_ME", 0, 0 };
+	ExpressionTranslator e;
+	std::vector<Token> toks = {
+		{ TokenType::Unknown, "DONT_CHANGE_ME", 0, 0 }
+	};
+
 	STRCMP_EQUAL ("DONT_CHANGE_ME", strip(e.translate(toks)).c_str());
 
 	toks[0].lexeme = "";
@@ -66,9 +73,12 @@ TEST (expr_translator_test_group, test_translate_left_lexeme_untouched)
 
 TEST (expr_translator_test_group, test_translate_separates_tokens_with_single_space)
 {
-	toks[0] = Token{ TokenType::Unknown, "DONT_CHANGE_ME", 0, 0 };
-	toks.push_back(toks[0]);
-	toks.push_back(toks[0]);
+	ExpressionTranslator e;
+	std::vector<Token> toks = {
+		{ TokenType::Unknown, "DONT_CHANGE_ME", 0, 0 },
+		{ TokenType::Unknown, "DONT_CHANGE_ME", 0, 0 },
+		{ TokenType::Unknown, "DONT_CHANGE_ME", 0, 0 }
+	};
 
 	STRCMP_EQUAL ("DONT_CHANGE_ME DONT_CHANGE_ME DONT_CHANGE_ME",
 				strip(e.translate(toks)).c_str());
