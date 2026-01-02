@@ -1,5 +1,19 @@
-//c++ -Iinclude src/lexer.cpp src/expr_translator.cpp src/control_flow_translator.cpp src/main.cpp -o translator
-//./translator
+/**
+ * \mainpage C to Python translator
+ *
+ * This project implements a translator that converts programs
+ * written in a subset of the C programming language into semantically
+ * equivalent Python code. The translator performs lexical, syntactic,
+ * and semantic analysis of the input C code, followed by the generation
+ * of valid Python source code that replicates the original program's logic
+ * and behavior.
+ *
+ * \authors
+ * - [Maxim Gorlatenko](https://github.com/mqwl)
+ * - [Danila Kabanov](https://github.com/Danila121)
+ * - [German Puzhalin](https://github.com/puzhaling)
+ * - [Danila Porohov](https://github.com/blackmagicqqqqdwqd)
+*/
 
 
 #include "lexer.h"

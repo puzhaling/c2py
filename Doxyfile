@@ -1,0 +1,15 @@
+WARNINGS               = YES
+
+PROJECT_NAME           = c2py
+
+PROJECT_BRIEF          = "A simple translator from C's subset to Python"
+
+OUTPUT_DIRECTORY       = docs
+
+CREATE_SUBDIRS         = YES
+
+OUTPUT_LANGUAGE        = English
+
+INPUT                  = src/main.cpp include/tables.h include/token.h include/lexer.h
+
+EXTRACT_PRIVATE        = YES

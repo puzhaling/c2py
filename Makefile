@@ -21,3 +21,14 @@ check :
 	@c++ $(CPPFLAGS) $(test_srcs_abs_path) $(srcs_abs_path) \
 				$(LDFLAGS) -o $(tests_dir)/test_all
 	@$(tests_dir)/test_all
+
+
+.PHONY : html
+html :
+	doxygen Doxyfile
+
+
+.PHONY : clean
+clean :
+	rm -rf docs
+	rm -f tests/test_all
