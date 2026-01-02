@@ -2,6 +2,7 @@
 
 IMPORT_TEST_GROUP (file_walker_test_group);
 IMPORT_TEST_GROUP (expr_translator_test_group);
+IMPORT_TEST_GROUP (lexer_test_group);
 
 int main (int ac, char **av)
 {
