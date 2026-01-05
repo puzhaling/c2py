@@ -76,9 +76,14 @@ Token Lexer::readOperator() {
     std::string buf; // Буфер, в который записываем предполагаемый оператор
     // Считываем символы и проверяем, есть ли там оператор
     buf += get();
+    std::string two = buf + peek();
     if (!eof()) {
-        std::string two = buf + peek();
         if (OPERATORS.count(two))
+            buf += get();
+    }
+    if (!eof()) {
+        std::string three = two + peek();
+        if (OPERATORS.count(three))
             buf += get();
     }
     // Если не определили оператор, то выводим ошибку
