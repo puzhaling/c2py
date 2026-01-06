@@ -1,3 +1,5 @@
 tests/test_all
 .gitignore
 /docs/*
+demo
+translator

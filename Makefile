@@ -5,15 +5,15 @@ tests_dir := ./tests
 src_dir := ./src
 headers_dir = ./include
 
-srcs := control_flow_translator.cpp \
-		expr_translator.cpp lexer.cpp
+srcs := expr_translator.cpp lexer.cpp parser.cpp ast.cpp
+
 srcs_abs_path := $(addprefix $(src_dir)/,$(srcs))
 
 test_srcs := $(addprefix test_,$(srcs) all.cc)
 test_srcs_abs_path := $(addprefix $(tests_dir)/,$(test_srcs))
 
-headers := expr_translator.h control_flow_translator.h \
-			lexer.h
+headers := expr_translator.h lexer.h parser.h ast.h symbol_table.h
+
 headers_abs_path := $(addprefix $(headers_dir)/,$(headers))
 
 .PHONY : check
