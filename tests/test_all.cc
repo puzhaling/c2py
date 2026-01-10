@@ -3,6 +3,7 @@
 IMPORT_TEST_GROUP (expr_translator_test_group);
 IMPORT_TEST_GROUP (lexer_test_group);
 IMPORT_TEST_GROUP (parser_test_group);
+IMPORT_TEST_GROUP (symbol_table_test_group);
 
 int main (int ac, char **av)
 {

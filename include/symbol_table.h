@@ -4,42 +4,49 @@
 #include <vector>
 #include "ast.h"
 
+
+struct SymbolTableTester;
+
 /*
  SymbolTable: стек областей видимости.
  Сохраняет соответствие имени -> ASTNode* (объявление переменной/функции).
 */
 class SymbolTable {
 public:
-    SymbolTable() { pushScope(); }
+    SymbolTable();
 
-    void pushScope() {
-        scopes.emplace_back();
-    }
-
-    void popScope() {
-        if (!scopes.empty()) scopes.pop_back();
-    }
+    using ScopeContainer = std::vector<
+        std::unordered_map<std::string, ASTNode*>
+    >;
+    
+    void pushScope();
+    void popScope();
 
     // объявление символа в текущей области
-    void declare(const std::string& name, ASTNode* decl) {
-        if (scopes.empty()) pushScope();
-        scopes.back()[name] = decl;
-    }
+    void declare(const std::string& name, ASTNode* decl);
 
     // поиск символа начиная с текущей области и вверх
-    ASTNode* lookup(const std::string& name) const {
-        for (auto it = scopes.rbegin(); it != scopes.rend(); ++it) {
-            auto found = it->find(name);
-            if (found != it->end()) return found->second;
-        }
-        return nullptr;
-    }
+    ASTNode* lookup(const std::string& name) const;
 
-    bool isDeclaredInCurrentScope(const std::string& name) const {
-        if (scopes.empty()) return false;
-        return scopes.back().count(name) > 0;
-    }
+    bool isDeclaredInCurrentScope(const std::string& name) const;
+
+    friend struct SymbolTableTester;
+protected:
+    const ScopeContainer& getScopes() const;
 
 private:
     std::vector<std::unordered_map<std::string, ASTNode*>> scopes;
+};
+
+
+struct SymbolTableTester
+{
+    SymbolTable& st;
+
+    explicit SymbolTableTester (SymbolTable &st)
+        :   st (st)
+    {
+    }
+
+    const SymbolTable::ScopeContainer& getScopes() const;
 };
