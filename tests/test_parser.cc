@@ -124,3 +124,15 @@ TEST (parser_test_group, test_match)
     CHECK (pt.match(TokenType::Number, "5"));
     CHECK ( ! pt.match(TokenType::EndOfFile, ""));
 }
+
+TEST (parser_test_group, test_token_location)
+{
+    Lexer l("1");
+    auto tokens = l.tokenize();
+    Parser p(tokens);
+    ParserTester pt(p);
+
+    CHECK_EQUAL (std::string{"line 1 col 1"}, pt.tokenLocation());
+    pt.advance();
+    CHECK_EQUAL (std::string{"<EOF>"}, pt.tokenLocation());
+}

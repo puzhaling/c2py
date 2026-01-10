@@ -21,6 +21,7 @@ public:
     bool check(TokenType type, const std::string& lexeme = "") const;
     bool match(TokenType type, const std::string& lexeme = "");
     void expect(TokenType type, const std::string& lexeme = "");
+    std::string tokenLocation() const;
 };
 
 #endif  /*  ! PARSER_TESTER_H  */

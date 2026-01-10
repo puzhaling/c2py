@@ -59,8 +59,9 @@ TEST (lexer_test_group, test_tokenize_keywords)
         " switch case default"
 	);
 
-    for (const auto &tkn : tkns)
+    for (const auto &tkn : tkns) {
         CHECK (TokenType::Keyword == tkn.type);
+	}
 
     STRCMP_EQUAL ("if",       tkns[0].lexeme.c_str ());
     STRCMP_EQUAL ("else",     tkns[1].lexeme.c_str ());
@@ -82,8 +83,9 @@ TEST (lexer_test_group, test_tokenize_types)
 		"int float double char bool void"
 	);
 
-    for (const auto &tkn : tkns)
+    for (const auto &tkn : tkns) {
         CHECK (TokenType::Keyword == tkn.type);
+	}
 
     STRCMP_EQUAL ("int",    tkns[0].lexeme.c_str ());
     STRCMP_EQUAL ("float",  tkns[1].lexeme.c_str ());
@@ -107,8 +109,9 @@ TEST (lexer_test_group, test_tokenize_operators)
 		" ? :"
 	);
 
-    for (const auto &tkn : tkns)
+    for (const auto &tkn : tkns) {
         CHECK (TokenType::Operator == tkn.type);
+	}
 
     STRCMP_EQUAL ("+",   tkns[0].lexeme.c_str ());
     STRCMP_EQUAL ("-",   tkns[1].lexeme.c_str ());

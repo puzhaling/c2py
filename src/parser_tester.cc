@@ -54,3 +54,9 @@ ParserTester::expect(TokenType type, const std::string& lexeme)
 {
     return p.expect(type, lexeme);
 }
+
+std::string
+ParserTester::tokenLocation() const
+{
+    return p.tokenLocation();
+}
