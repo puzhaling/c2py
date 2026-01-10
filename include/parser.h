@@ -6,6 +6,9 @@
 #include <memory>
 #include <string>
 
+
+class ParserTester;
+
 class Parser {
 public:
     explicit Parser(const std::vector<Token>& tokens);
@@ -13,6 +16,8 @@ public:
     // Разобрать программу; бросает std::runtime_error при синтаксической ошибке.
     ProgramPtr parseProgram();
 
+    friend class ParserTester;
+    
 private:
     const std::vector<Token>& tokens;
     size_t pos;

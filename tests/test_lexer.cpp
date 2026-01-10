@@ -161,8 +161,9 @@ TEST (lexer_test_group, test_tokenize_separators)
 		"; , ."
 	);
 
-    for (const auto &tkn : tkns)
+    for (const auto &tkn : tkns) {
         CHECK (TokenType::Separator == tkn.type);
+	}
 
 	STRCMP_EQUAL ("(", tkns[0].lexeme.c_str ());
 	STRCMP_EQUAL (")", tkns[1].lexeme.c_str ());
