@@ -11,7 +11,7 @@ class ParserTester;
 
 class Parser {
 public:
-    explicit Parser(const std::vector<Token>& tokens);
+    explicit Parser(std::vector<Token> tokens);
 
     // Разобрать программу; бросает std::runtime_error при синтаксической ошибке.
     ProgramPtr parseProgram();
@@ -19,7 +19,7 @@ public:
     friend class ParserTester;
     
 private:
-    const std::vector<Token>& tokens;
+    const std::vector<Token> tokens;
     size_t pos;
     SymbolTable symbols;
 

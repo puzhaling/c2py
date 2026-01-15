@@ -2,10 +2,11 @@
 #include <stdexcept>
 #include <sstream>
 #include <iostream>
+#include <memory>
 
 // --- constructor
-Parser::Parser(const std::vector<Token>& tokens)
-    : tokens(tokens), pos(0) {
+Parser::Parser(std::vector<Token> tokens)
+    : tokens(std::move(tokens)), pos(0) {
     // initial scope already pushed by SymbolTable ctor
 }
 

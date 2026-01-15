@@ -1,5 +1,5 @@
 CPPFLAGS = -iquote $(headers_dir)
-CXXFLAGS := -Wall -Wextra
+CXXFLAGS := -g -Wall -Wextra
 LDFLAGS := -lCppUTest
 
 tests_dir := ./tests
