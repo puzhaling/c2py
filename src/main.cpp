@@ -18,6 +18,9 @@
 #include "lexer.h"
 #include "parser.h"
 #include "ast.h"
+#include "semantic.h"
+#include "symbol_table.h"
+#include "code_generator.h"
 
 // Загружает исходник либо из файла argv[1], либо возвращает встроенный пример.
 static std::string loadSource(int argc, char** argv) {
@@ -74,6 +77,9 @@ int main() {
 int main(int argc, char** argv) {
     try {
         std::string code = loadSource(argc, argv);
+        
+        // Определяем источник кода
+        std::string sourceInfo = (argc > 1) ? std::string("File: ") + argv[1] : "Built-in example";
 
         // 1) Лексический анализ
         Lexer lexer(code);
@@ -83,8 +89,39 @@ int main(int argc, char** argv) {
         Parser parser(tokens);
         auto program = parser.parseProgram();
 
-        // 3) Печать AST (удобно для отладки)
-        printProgramAST(program.get(), std::cout);
+        // 3) Семантический анализ
+        SymbolTable symbolTable;
+        SemanticAnalyzer semanticAnalyzer(symbolTable);
+        if (!semanticAnalyzer.analyze(program)) {
+            std::cerr << "=== Semantic Analysis Errors ===" << std::endl;
+            for (const auto& err : semanticAnalyzer.getErrors()) {
+                std::cerr << err << std::endl;
+            }
+            return 1;
+        }
+        
+        // Вывод предупреждений если есть
+        if (!semanticAnalyzer.getWarnings().empty()) {
+            std::cerr << "=== Warnings ===" << std::endl;
+            for (const auto& warn : semanticAnalyzer.getWarnings()) {
+                std::cerr << warn << std::endl;
+            }
+        }
+
+        // 4) Генерация Python кода
+        CodeGenerator codeGen(&semanticAnalyzer);
+        std::string pythonCode = codeGen.generate(program.get());
+        
+        // Вывод с информацией об источнике
+        std::cout << "\n========================================" << std::endl;
+        std::cout << "  C to Python Code Translator" << std::endl;
+        std::cout << "========================================" << std::endl;
+        std::cout << "\nSource: " << sourceInfo << std::endl;
+        std::cout << "\n----------------------------------------" << std::endl;
+        std::cout << "Generated Python Code:" << std::endl;
+        std::cout << "----------------------------------------\n" << std::endl;
+        std::cout << pythonCode << std::endl;
+        std::cout << "----------------------------------------" << std::endl;
 
         return 0;
     } catch (const std::exception& ex) {
