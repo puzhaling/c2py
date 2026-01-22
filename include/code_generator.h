@@ -47,6 +47,10 @@ private:
     std::string generateIdentifier(IdentifierExpr* expr);
     std::string generateUnary(UnaryExpr* expr);
     std::string generateBinary(BinaryExpr* expr);
+<<<<<<< HEAD
+=======
+    std::string generateCall(CallExpr* expr);
+>>>>>>> d354e8b (Add complete C to Python translator implementation with function call support and updated examples)
     
     // Трансляция операторов
     std::string translateUnaryOp(const std::string& op);

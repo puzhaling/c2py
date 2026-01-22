@@ -372,7 +372,30 @@ ExprPtr Parser::parsePrimary() {
     }
 
     if (match(TokenType::Identifier)) {
+<<<<<<< HEAD
         auto id = std::make_unique<IdentifierExpr>(previous().lexeme);
+=======
+        std::string name = previous().lexeme;
+        
+        // Check if it's a function call
+        if (check(TokenType::Separator, "(")) {
+            advance(); // consume '('
+            auto call = std::make_unique<CallExpr>(name);
+            
+            // Parse arguments
+            if (!check(TokenType::Separator, ")")) {
+                do {
+                    call->args.push_back(parseExpression());
+                } while (match(TokenType::Separator, ","));
+            }
+            
+            expect(TokenType::Separator, ")");
+            return call;
+        }
+        
+        // Otherwise it's just an identifier
+        auto id = std::make_unique<IdentifierExpr>(name);
+>>>>>>> d354e8b (Add complete C to Python translator implementation with function call support and updated examples)
         ASTNode* decl = symbols.lookup(id->name);
         if (decl) id->declaration = decl;
         return id;
