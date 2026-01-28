@@ -42,15 +42,12 @@ struct BinaryExpr : Expression {
         : op(std::move(o)), lhs(std::move(l)), rhs(std::move(r)) {}
 };
 
-<<<<<<< HEAD
-=======
 struct CallExpr : Expression {
     std::string name;
     std::vector<std::unique_ptr<Expression>> args;
     CallExpr(std::string n) : name(std::move(n)) {}
 };
 
->>>>>>> d354e8b (Add complete C to Python translator implementation with function call support and updated examples)
 /* ===== STATEMENTS ===== */
 struct Statement : ASTNode { virtual ~Statement() = default; };
 

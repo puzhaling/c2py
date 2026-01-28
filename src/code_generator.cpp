@@ -128,8 +128,6 @@ std::string CodeGenerator::generateBinary(BinaryExpr* expr) {
     return lhs + " " + op + " " + rhs;
 }
 
-<<<<<<< HEAD
-=======
 std::string CodeGenerator::generateCall(CallExpr* expr) {
     std::string funcName = pythonifyVarName(expr->name);
     std::string args;
@@ -142,7 +140,6 @@ std::string CodeGenerator::generateCall(CallExpr* expr) {
     return funcName + "(" + args + ")";
 }
 
->>>>>>> d354e8b (Add complete C to Python translator implementation with function call support and updated examples)
 std::string CodeGenerator::generateExpression(Expression* expr) {
     if (!expr) return "";
     
@@ -158,12 +155,9 @@ std::string CodeGenerator::generateExpression(Expression* expr) {
     if (auto* binary = dynamic_cast<BinaryExpr*>(expr)) {
         return generateBinary(binary);
     }
-<<<<<<< HEAD
-=======
     if (auto* call = dynamic_cast<CallExpr*>(expr)) {
         return generateCall(call);
     }
->>>>>>> d354e8b (Add complete C to Python translator implementation with function call support and updated examples)
     
     return "";
 }

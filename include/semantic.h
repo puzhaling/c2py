@@ -86,12 +86,9 @@ private:
     // Карта аннотаций: ASTNode* -> SemanticAnnotation
     std::unordered_map<ASTNode*, SemanticAnnotation> annotations;
     
-<<<<<<< HEAD
-=======
     // Хранилище для временных VarDecl объектов параметров
     std::vector<std::unique_ptr<VarDecl>> parameterDecls;
     
->>>>>>> d354e8b (Add complete C to Python translator implementation with function call support and updated examples)
     // Вспомогательные методы
     void error(const std::string& msg, ASTNode* node);
     void warning(const std::string& msg, ASTNode* node);
@@ -125,10 +122,7 @@ private:
     TypeInfo analyzeUnaryExpr(UnaryExpr* expr);
     TypeInfo analyzeIdentifier(IdentifierExpr* expr);
     TypeInfo analyzeNumber(NumberExpr* expr);
-<<<<<<< HEAD
-=======
     TypeInfo analyzeCall(CallExpr* expr);
->>>>>>> d354e8b (Add complete C to Python translator implementation with function call support and updated examples)
     
     // Проверки типов
     bool checkTypeCompatibility(const TypeInfo& expected, const TypeInfo& actual, 

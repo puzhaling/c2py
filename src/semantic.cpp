@@ -80,13 +80,9 @@ void
 SemanticAnalyzer::analyzeProgram (Program* program)
 {
     // Первый проход: объявляем все функции
-<<<<<<< HEAD
-    for (auto& func : program->functions) {
-=======
 
     for (auto& func : program->functions) {
 
->>>>>>> d354e8b (Add complete C to Python translator implementation with function call support and updated examples)
         // Создаем аннотацию для функции
         SemanticAnnotation& ann = annotate(func.get());
         ann.returnType = typeFromString(func->returnType);
@@ -102,31 +98,22 @@ SemanticAnalyzer::analyzeProgram (Program* program)
     }
     
     // Второй проход: анализируем тела функций
-<<<<<<< HEAD
-    for (auto& func : program->functions) {
-        analyzeFunction(func.get());
-    }
-=======
 
     for (auto& func : program->functions) {
 
         analyzeFunction(func.get());
     }
 
->>>>>>> d354e8b (Add complete C to Python translator implementation with function call support and updated examples)
 }
 
 void
 SemanticAnalyzer::analyzeFunction (FunctionDecl* func)
 {
-<<<<<<< HEAD
-=======
 
     
     // Очищаем старые параметры
     parameterDecls.clear();
     
->>>>>>> d354e8b (Add complete C to Python translator implementation with function call support and updated examples)
     // Устанавливаем контекст
     inFunction = true;
     currentFunctionName = func->name;
@@ -141,16 +128,10 @@ SemanticAnalyzer::analyzeFunction (FunctionDecl* func)
     
     // Объявляем параметры
     for (const auto& param : func->params) {
-<<<<<<< HEAD
-        TypeInfo paramType = typeFromString(param.first);
-        
-        // Создаем временный узел для параметра
-=======
 
         TypeInfo paramType = typeFromString(param.first);
         
         // Создаем узел для параметра и сохраняем его в хранилище
->>>>>>> d354e8b (Add complete C to Python translator implementation with function call support and updated examples)
         auto paramDecl = std::make_unique<VarDecl>(param.first, param.second);
         paramDecl->line = func->line;
         paramDecl->column = func->column;
@@ -160,15 +141,6 @@ SemanticAnalyzer::analyzeFunction (FunctionDecl* func)
         ann.type = paramType;
         ann.isLValue = true;
         
-<<<<<<< HEAD
-        symbolTable.declare(param.second, paramDecl.get());
-    }
-    
-    // Анализируем тело функции
-    if (func->body) {
-        analyzeBlock(func->body.get());
-    }
-=======
         // Объявляем в таблице символов, используя адрес из хранилища
         parameterDecls.push_back(std::move(paramDecl));
         symbolTable.declare(param.second, parameterDecls.back().get());
@@ -180,7 +152,6 @@ SemanticAnalyzer::analyzeFunction (FunctionDecl* func)
         analyzeBlock(func->body.get());
     }
 
->>>>>>> d354e8b (Add complete C to Python translator implementation with function call support and updated examples)
     
     // Проверяем, что не-void функция возвращает значение
     if (currentReturnType != TypeInfo::Void && !funcAnn->returnsValue) {
@@ -190,55 +161,11 @@ SemanticAnalyzer::analyzeFunction (FunctionDecl* func)
     symbolTable.popScope();
     inFunction = false;
     currentFunctionName.clear();
-<<<<<<< HEAD
-=======
-
->>>>>>> d354e8b (Add complete C to Python translator implementation with function call support and updated examples)
 }
 
 void
 SemanticAnalyzer::analyzeBlock (BlockStmt* block)
 {
-<<<<<<< HEAD
-    symbolTable.pushScope();
-    
-    for (auto& stmt : block->statements) {
-        analyzeStatement(stmt.get());
-    }
-    
-    symbolTable.popScope();
-}
-
-void SemanticAnalyzer::analyzeStatement(Statement* stmt) {
-    if (auto varDecl = dynamic_cast<VarDecl*>(stmt)) {
-        analyzeVarDecl(varDecl);
-    }
-    else if (auto block = dynamic_cast<BlockStmt*>(stmt)) {
-        analyzeBlock(block);
-    }
-    else if (auto ifStmt = dynamic_cast<IfStmt*>(stmt)) {
-        analyzeIf(ifStmt);
-    }
-    else if (auto whileStmt = dynamic_cast<WhileStmt*>(stmt)) {
-        analyzeWhile(whileStmt);
-    }
-    else if (auto doWhileStmt = dynamic_cast<DoWhileStmt*>(stmt)) {
-        analyzeDoWhile(doWhileStmt);
-    }
-    else if (auto forStmt = dynamic_cast<ForStmt*>(stmt)) {
-        analyzeFor(forStmt);
-    }
-    else if (auto returnStmt = dynamic_cast<ReturnStmt*>(stmt)) {
-        analyzeReturn(returnStmt);
-    }
-    else if (auto breakStmt = dynamic_cast<BreakStmt*>(stmt)) {
-        analyzeBreak(breakStmt);
-    }
-    else if (auto continueStmt = dynamic_cast<ContinueStmt*>(stmt)) {
-        analyzeContinue(continueStmt);
-    }
-    else if (auto exprStmt = dynamic_cast<ExpressionStmt*>(stmt)) {
-=======
 
     symbolTable.pushScope();
     
@@ -291,20 +218,14 @@ void SemanticAnalyzer::analyzeStatement(Statement* stmt) {
     }
     else if (auto exprStmt = dynamic_cast<ExpressionStmt*>(stmt)) {
 
->>>>>>> d354e8b (Add complete C to Python translator implementation with function call support and updated examples)
         analyzeExpressionStmt(exprStmt);
     }
     else {
         // Это должно быть невозможно, если парсер корректен
-<<<<<<< HEAD
-        error("Unknown statement type", stmt);
-    }
-=======
 
         error("Unknown statement type", stmt);
     }
 
->>>>>>> d354e8b (Add complete C to Python translator implementation with function call support and updated examples)
 }
 
 void
@@ -345,22 +266,6 @@ SemanticAnalyzer::analyzeVarDecl (VarDecl* decl)
 TypeInfo
 SemanticAnalyzer::analyzeExpression (Expression* expr) 
 {
-<<<<<<< HEAD
-    TypeInfo resultType(TypeInfo::Unknown);
-    
-    if (auto num = dynamic_cast<NumberExpr*>(expr)) {
-        resultType = analyzeNumber(num);
-    }
-    else if (auto id = dynamic_cast<IdentifierExpr*>(expr)) {
-        resultType = analyzeIdentifier(id);
-    }
-    else if (auto binary = dynamic_cast<BinaryExpr*>(expr)) {
-        resultType = analyzeBinaryExpr(binary);
-    }
-    else if (auto unary = dynamic_cast<UnaryExpr*>(expr)) {
-        resultType = analyzeUnaryExpr(unary);
-    }
-=======
 
     TypeInfo resultType(TypeInfo::Unknown);
     
@@ -387,7 +292,6 @@ SemanticAnalyzer::analyzeExpression (Expression* expr)
     else {
 
     }
->>>>>>> d354e8b (Add complete C to Python translator implementation with function call support and updated examples)
     
     // Сохраняем тип в аннотации
     if (expr) {
@@ -395,25 +299,16 @@ SemanticAnalyzer::analyzeExpression (Expression* expr)
         ann.type = resultType;
     }
     
-<<<<<<< HEAD
-=======
-
->>>>>>> d354e8b (Add complete C to Python translator implementation with function call support and updated examples)
     return resultType;
 }
 
 TypeInfo
 SemanticAnalyzer::analyzeIdentifier (IdentifierExpr* expr)
 {
-<<<<<<< HEAD
-    // Ищем в таблице символов
-    ASTNode* decl = symbolTable.lookup(expr->name);
-=======
 
     // Ищем в таблице символов
     ASTNode* decl = symbolTable.lookup(expr->name);
 
->>>>>>> d354e8b (Add complete C to Python translator implementation with function call support and updated examples)
     if (!decl) {
         error("Undeclared identifier: '" + expr->name + "'", expr);
         return TypeInfo(TypeInfo::Error);
@@ -423,21 +318,11 @@ SemanticAnalyzer::analyzeIdentifier (IdentifierExpr* expr)
     expr->declaration = decl;
     
     // Аннотируем идентификатор
-<<<<<<< HEAD
-=======
-
->>>>>>> d354e8b (Add complete C to Python translator implementation with function call support and updated examples)
     SemanticAnnotation& ann = annotate(expr);
     ann.isLValue = true;
     ann.resolvedDecl = decl;
     
     // Получаем тип из объявления
-<<<<<<< HEAD
-    if (auto varDecl = dynamic_cast<VarDecl*>(decl)) {
-        SemanticAnnotation* declAnn = getAnnotation(varDecl);
-        if (declAnn) {
-            ann.type = declAnn->type;
-=======
 
     if (auto varDecl = dynamic_cast<VarDecl*>(decl)) {
 
@@ -446,15 +331,10 @@ SemanticAnalyzer::analyzeIdentifier (IdentifierExpr* expr)
         if (declAnn) {
             ann.type = declAnn->type;
 
->>>>>>> d354e8b (Add complete C to Python translator implementation with function call support and updated examples)
             return declAnn->type;
         }
     }
     
-<<<<<<< HEAD
-=======
-
->>>>>>> d354e8b (Add complete C to Python translator implementation with function call support and updated examples)
     return TypeInfo(TypeInfo::Unknown);
 }
 
@@ -484,8 +364,6 @@ SemanticAnalyzer::analyzeNumber (NumberExpr* expr)
     }
 }
 
-<<<<<<< HEAD
-=======
 TypeInfo
 SemanticAnalyzer::analyzeCall (CallExpr* expr)
 {
@@ -526,7 +404,6 @@ SemanticAnalyzer::analyzeCall (CallExpr* expr)
     return TypeInfo(TypeInfo::Error);
 }
 
->>>>>>> d354e8b (Add complete C to Python translator implementation with function call support and updated examples)
 void
 SemanticAnalyzer::analyzeIf (IfStmt* stmt)
 {
@@ -809,15 +686,8 @@ SemanticAnalyzer::analyzeBinaryExpr (BinaryExpr* expr)
 void
 SemanticAnalyzer::analyzeReturn (ReturnStmt* stmt)
 {
-<<<<<<< HEAD
     // Отмечаем, что функция возвращает значение
     if (inFunction) {
-=======
-
-    // Отмечаем, что функция возвращает значение
-    if (inFunction) {
-
->>>>>>> d354e8b (Add complete C to Python translator implementation with function call support and updated examples)
         SemanticAnnotation* funcAnn = getAnnotation(
             symbolTable.lookup(currentFunctionName)
         );
@@ -827,13 +697,7 @@ SemanticAnalyzer::analyzeReturn (ReturnStmt* stmt)
     }
     
     if (stmt->value) {
-<<<<<<< HEAD
         TypeInfo exprType = analyzeExpression(stmt->value.get());
-=======
-
-        TypeInfo exprType = analyzeExpression(stmt->value.get());
-
->>>>>>> d354e8b (Add complete C to Python translator implementation with function call support and updated examples)
         
         // Проверяем совместимость с типом возвращаемого значения
         checkTypeCompatibility(currentReturnType, exprType, stmt, "return statement");
@@ -847,10 +711,6 @@ SemanticAnalyzer::analyzeReturn (ReturnStmt* stmt)
             error("Function must return a value", stmt);
         }
     }
-<<<<<<< HEAD
-=======
-
->>>>>>> d354e8b (Add complete C to Python translator implementation with function call support and updated examples)
 }
 
 // Другие методы (analyzeIf, analyzeWhile, analyzeFor) аналогичны...
