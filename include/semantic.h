@@ -86,6 +86,9 @@ private:
     // Карта аннотаций: ASTNode* -> SemanticAnnotation
     std::unordered_map<ASTNode*, SemanticAnnotation> annotations;
     
+    // Хранилище для временных VarDecl объектов параметров
+    std::vector<std::unique_ptr<VarDecl>> parameterDecls;
+    
     // Вспомогательные методы
     void error(const std::string& msg, ASTNode* node);
     void warning(const std::string& msg, ASTNode* node);
@@ -119,6 +122,7 @@ private:
     TypeInfo analyzeUnaryExpr(UnaryExpr* expr);
     TypeInfo analyzeIdentifier(IdentifierExpr* expr);
     TypeInfo analyzeNumber(NumberExpr* expr);
+    TypeInfo analyzeCall(CallExpr* expr);
     
     // Проверки типов
     bool checkTypeCompatibility(const TypeInfo& expected, const TypeInfo& actual, 

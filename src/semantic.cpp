@@ -80,7 +80,9 @@ void
 SemanticAnalyzer::analyzeProgram (Program* program)
 {
     // Первый проход: объявляем все функции
+
     for (auto& func : program->functions) {
+
         // Создаем аннотацию для функции
         SemanticAnnotation& ann = annotate(func.get());
         ann.returnType = typeFromString(func->returnType);
@@ -96,14 +98,22 @@ SemanticAnalyzer::analyzeProgram (Program* program)
     }
     
     // Второй проход: анализируем тела функций
+
     for (auto& func : program->functions) {
+
         analyzeFunction(func.get());
     }
+
 }
 
 void
 SemanticAnalyzer::analyzeFunction (FunctionDecl* func)
 {
+
+    
+    // Очищаем старые параметры
+    parameterDecls.clear();
+    
     // Устанавливаем контекст
     inFunction = true;
     currentFunctionName = func->name;
@@ -118,9 +128,10 @@ SemanticAnalyzer::analyzeFunction (FunctionDecl* func)
     
     // Объявляем параметры
     for (const auto& param : func->params) {
+
         TypeInfo paramType = typeFromString(param.first);
         
-        // Создаем временный узел для параметра
+        // Создаем узел для параметра и сохраняем его в хранилище
         auto paramDecl = std::make_unique<VarDecl>(param.first, param.second);
         paramDecl->line = func->line;
         paramDecl->column = func->column;
@@ -130,13 +141,17 @@ SemanticAnalyzer::analyzeFunction (FunctionDecl* func)
         ann.type = paramType;
         ann.isLValue = true;
         
-        symbolTable.declare(param.second, paramDecl.get());
+        // Объявляем в таблице символов, используя адрес из хранилища
+        parameterDecls.push_back(std::move(paramDecl));
+        symbolTable.declare(param.second, parameterDecls.back().get());
     }
     
     // Анализируем тело функции
+
     if (func->body) {
         analyzeBlock(func->body.get());
     }
+
     
     // Проверяем, что не-void функция возвращает значение
     if (currentReturnType != TypeInfo::Void && !funcAnn->returnsValue) {
@@ -151,50 +166,66 @@ SemanticAnalyzer::analyzeFunction (FunctionDecl* func)
 void
 SemanticAnalyzer::analyzeBlock (BlockStmt* block)
 {
+
     symbolTable.pushScope();
     
-    for (auto& stmt : block->statements) {
-        analyzeStatement(stmt.get());
+    for (size_t i = 0; i < block->statements.size(); ++i) {
+
+        analyzeStatement(block->statements[i].get());
     }
     
     symbolTable.popScope();
+
 }
 
 void SemanticAnalyzer::analyzeStatement(Statement* stmt) {
+
     if (auto varDecl = dynamic_cast<VarDecl*>(stmt)) {
+
         analyzeVarDecl(varDecl);
     }
     else if (auto block = dynamic_cast<BlockStmt*>(stmt)) {
+
         analyzeBlock(block);
     }
     else if (auto ifStmt = dynamic_cast<IfStmt*>(stmt)) {
+
         analyzeIf(ifStmt);
     }
     else if (auto whileStmt = dynamic_cast<WhileStmt*>(stmt)) {
+
         analyzeWhile(whileStmt);
     }
     else if (auto doWhileStmt = dynamic_cast<DoWhileStmt*>(stmt)) {
+
         analyzeDoWhile(doWhileStmt);
     }
     else if (auto forStmt = dynamic_cast<ForStmt*>(stmt)) {
+
         analyzeFor(forStmt);
     }
     else if (auto returnStmt = dynamic_cast<ReturnStmt*>(stmt)) {
+
         analyzeReturn(returnStmt);
     }
     else if (auto breakStmt = dynamic_cast<BreakStmt*>(stmt)) {
+
         analyzeBreak(breakStmt);
     }
     else if (auto continueStmt = dynamic_cast<ContinueStmt*>(stmt)) {
+
         analyzeContinue(continueStmt);
     }
     else if (auto exprStmt = dynamic_cast<ExpressionStmt*>(stmt)) {
+
         analyzeExpressionStmt(exprStmt);
     }
     else {
         // Это должно быть невозможно, если парсер корректен
+
         error("Unknown statement type", stmt);
     }
+
 }
 
 void
@@ -235,19 +266,31 @@ SemanticAnalyzer::analyzeVarDecl (VarDecl* decl)
 TypeInfo
 SemanticAnalyzer::analyzeExpression (Expression* expr) 
 {
+
     TypeInfo resultType(TypeInfo::Unknown);
     
     if (auto num = dynamic_cast<NumberExpr*>(expr)) {
+
         resultType = analyzeNumber(num);
     }
     else if (auto id = dynamic_cast<IdentifierExpr*>(expr)) {
+
         resultType = analyzeIdentifier(id);
     }
     else if (auto binary = dynamic_cast<BinaryExpr*>(expr)) {
+
         resultType = analyzeBinaryExpr(binary);
     }
     else if (auto unary = dynamic_cast<UnaryExpr*>(expr)) {
+
         resultType = analyzeUnaryExpr(unary);
+    }
+    else if (auto call = dynamic_cast<CallExpr*>(expr)) {
+
+        resultType = analyzeCall(call);
+    }
+    else {
+
     }
     
     // Сохраняем тип в аннотации
@@ -262,8 +305,10 @@ SemanticAnalyzer::analyzeExpression (Expression* expr)
 TypeInfo
 SemanticAnalyzer::analyzeIdentifier (IdentifierExpr* expr)
 {
+
     // Ищем в таблице символов
     ASTNode* decl = symbolTable.lookup(expr->name);
+
     if (!decl) {
         error("Undeclared identifier: '" + expr->name + "'", expr);
         return TypeInfo(TypeInfo::Error);
@@ -278,10 +323,14 @@ SemanticAnalyzer::analyzeIdentifier (IdentifierExpr* expr)
     ann.resolvedDecl = decl;
     
     // Получаем тип из объявления
+
     if (auto varDecl = dynamic_cast<VarDecl*>(decl)) {
+
         SemanticAnnotation* declAnn = getAnnotation(varDecl);
+
         if (declAnn) {
             ann.type = declAnn->type;
+
             return declAnn->type;
         }
     }
@@ -313,6 +362,46 @@ SemanticAnalyzer::analyzeNumber (NumberExpr* expr)
         ann.type = TypeInfo(TypeInfo::Int);
         return TypeInfo(TypeInfo::Int);
     }
+}
+
+TypeInfo
+SemanticAnalyzer::analyzeCall (CallExpr* expr)
+{
+    // Ищем функцию в таблице символов
+    ASTNode* decl = symbolTable.lookup(expr->name);
+    if (!decl) {
+        error("Undefined function: '" + expr->name + "'", expr);
+        return TypeInfo(TypeInfo::Error);
+    }
+    
+    // Проверяем, что это функция
+    if (auto funcDecl = dynamic_cast<FunctionDecl*>(decl)) {
+        // Анализируем аргументы
+        for (auto& arg : expr->args) {
+            analyzeExpression(arg.get());
+        }
+        
+        // Получаем тип возврата функции
+        SemanticAnnotation& ann = annotate(expr);
+        
+        // Преобразуем C тип в TypeInfo
+        TypeInfo retType = TypeInfo(TypeInfo::Unknown);
+        if (funcDecl->returnType == "int") {
+            retType = TypeInfo(TypeInfo::Int);
+        } else if (funcDecl->returnType == "float") {
+            retType = TypeInfo(TypeInfo::Float);
+        } else if (funcDecl->returnType == "double") {
+            retType = TypeInfo(TypeInfo::Double);
+        } else if (funcDecl->returnType == "void") {
+            retType = TypeInfo(TypeInfo::Void);
+        }
+        
+        ann.type = retType;
+        return retType;
+    }
+    
+    error("'" + expr->name + "' is not a function", expr);
+    return TypeInfo(TypeInfo::Error);
 }
 
 void

@@ -47,6 +47,7 @@ private:
     std::string generateIdentifier(IdentifierExpr* expr);
     std::string generateUnary(UnaryExpr* expr);
     std::string generateBinary(BinaryExpr* expr);
+    std::string generateCall(CallExpr* expr);
     
     // Трансляция операторов
     std::string translateUnaryOp(const std::string& op);

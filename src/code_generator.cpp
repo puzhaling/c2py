@@ -128,6 +128,18 @@ std::string CodeGenerator::generateBinary(BinaryExpr* expr) {
     return lhs + " " + op + " " + rhs;
 }
 
+std::string CodeGenerator::generateCall(CallExpr* expr) {
+    std::string funcName = pythonifyVarName(expr->name);
+    std::string args;
+    
+    for (size_t i = 0; i < expr->args.size(); ++i) {
+        if (i > 0) args += ", ";
+        args += generateExpression(expr->args[i].get());
+    }
+    
+    return funcName + "(" + args + ")";
+}
+
 std::string CodeGenerator::generateExpression(Expression* expr) {
     if (!expr) return "";
     
@@ -142,6 +154,9 @@ std::string CodeGenerator::generateExpression(Expression* expr) {
     }
     if (auto* binary = dynamic_cast<BinaryExpr*>(expr)) {
         return generateBinary(binary);
+    }
+    if (auto* call = dynamic_cast<CallExpr*>(expr)) {
+        return generateCall(call);
     }
     
     return "";

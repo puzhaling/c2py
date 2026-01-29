@@ -17,3 +17,7 @@ Project Structure:
 	src/ - Source code of the translator (C++)
 	include/ - Header files
 	tests/ - CppUTest test suites
+
+Requirements:
+	CppUTest - testing
+	FLTK - user interface

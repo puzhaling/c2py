@@ -42,6 +42,12 @@ struct BinaryExpr : Expression {
         : op(std::move(o)), lhs(std::move(l)), rhs(std::move(r)) {}
 };
 
+struct CallExpr : Expression {
+    std::string name;
+    std::vector<std::unique_ptr<Expression>> args;
+    CallExpr(std::string n) : name(std::move(n)) {}
+};
+
 /* ===== STATEMENTS ===== */
 struct Statement : ASTNode { virtual ~Statement() = default; };
 

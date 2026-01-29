@@ -21,24 +21,94 @@
 #include "semantic.h"
 #include "symbol_table.h"
 #include "code_generator.h"
+#include "gui.h"
 
-// Загружает исходник либо из файла argv[1], либо возвращает встроенный пример.
-static std::string loadSource(int argc, char** argv) {
-    if (argc > 1) {
-        std::ifstream in(argv[1]);
-        if (!in) {
-            std::ostringstream err;
-            err << "Cannot open input file: " << argv[1];
-            throw std::runtime_error(err.str());
-        }
-        std::ostringstream ss;
-        ss << in.rdbuf();
-        return ss.str();
+#include <FL/Fl_Native_File_Chooser.H>
+#include <FL/Fl_Text_Buffer.H>
+
+
+Fl_Text_Buffer *inputBuf = new Fl_Text_Buffer();
+Fl_Text_Buffer *outputBuf = new Fl_Text_Buffer();
+
+void ui_import(Fl_Button*, void*) {
+    Fl_Native_File_Chooser fc;
+    fc.title("c2py / Import C file");
+    fc.type(Fl_Native_File_Chooser::BROWSE_FILE);
+    fc.filter("C File\t*.{c,cpp,h}");
+    if (fc.show() == 0) {
+        inputBuf->loadfile(fc.filename());
     }
+}
 
-    // Встроенный пример
- return R"(
-int main() {
+void ui_export(Fl_Button*, void*) {
+    Fl_Native_File_Chooser fc;
+    fc.title("c2py / Import Python file");
+    fc.type(Fl_Native_File_Chooser::BROWSE_SAVE_FILE);
+    fc.filter("Python File\t*.py");
+    fc.preset_file("translated.py");
+    if (fc.show() == 0) {
+        outputBuf->savefile(fc.filename());
+    }
+}
+
+void ui_translate(Fl_Button*, void*) {
+    std::string code = inputBuf->text();
+    if (code.empty()) return;
+    try {
+        //std::string code = loadSource(argc, argv);
+        
+        // Определяем источник кода
+        //std::string sourceInfo = (argc > 1) ? std::string("File: ") + argv[1] : "Built-in example";
+
+        // 1) Лексический анализ
+        Lexer lexer(code);
+        auto tokens = lexer.tokenize();
+
+        // 2) Синтаксический анализ → AST
+        Parser parser(tokens);
+        auto program = parser.parseProgram();
+
+        // 3) Семантический анализ
+        SymbolTable symbolTable;
+        SemanticAnalyzer semanticAnalyzer(symbolTable);
+        if (!semanticAnalyzer.analyze(program)) {
+            std::string error = "=== Semantic Analysis Errors ===\n";
+            for (const auto& err : semanticAnalyzer.getErrors()) {
+                error += err + "\n";
+            }
+            outputBuf->text(error.c_str());
+            return;
+        }
+        
+        // Вывод предупреждений если есть
+        if (!semanticAnalyzer.getWarnings().empty()) {
+            std::string warning = "# === Warnings ===\n";
+            for (const auto& warn : semanticAnalyzer.getWarnings()) {
+                warning += "# " + warn + "\n";
+            }
+            outputBuf->text(warning.c_str());
+        }
+
+        // 4) Генерация Python кода
+        CodeGenerator codeGen(&semanticAnalyzer);
+        std::string pythonCode = codeGen.generate(program.get());
+        
+        // 5) Вывод
+        outputBuf->text(pythonCode.c_str());
+
+    } catch (const std::exception& ex) {
+        outputBuf->text(ex.what());
+    }
+}
+
+int main(int argc, char** argv) {
+    UserInterface* ui = new UserInterface();
+    Fl_Window* window = ui->make_window();
+    ui->input_window->buffer(inputBuf);
+    ui->input_window->linenumber_width(30); 
+    ui->input_window->linenumber_size(12);
+    ui->output_window->buffer(outputBuf);
+    inputBuf->text(R"(int main() {
     int i = 0;
     int j = 0;
     int k = 10;
@@ -70,62 +140,8 @@ int main() {
     k %= 5;
 
     return 42;
-}
-)";
-}
+    })");
 
-int main(int argc, char** argv) {
-    try {
-        std::string code = loadSource(argc, argv);
-        
-        // Определяем источник кода
-        std::string sourceInfo = (argc > 1) ? std::string("File: ") + argv[1] : "Built-in example";
-
-        // 1) Лексический анализ
-        Lexer lexer(code);
-        auto tokens = lexer.tokenize();
-
-        // 2) Синтаксический анализ → AST
-        Parser parser(tokens);
-        auto program = parser.parseProgram();
-
-        // 3) Семантический анализ
-        SymbolTable symbolTable;
-        SemanticAnalyzer semanticAnalyzer(symbolTable);
-        if (!semanticAnalyzer.analyze(program)) {
-            std::cerr << "=== Semantic Analysis Errors ===" << std::endl;
-            for (const auto& err : semanticAnalyzer.getErrors()) {
-                std::cerr << err << std::endl;
-            }
-            return 1;
-        }
-        
-        // Вывод предупреждений если есть
-        if (!semanticAnalyzer.getWarnings().empty()) {
-            std::cerr << "=== Warnings ===" << std::endl;
-            for (const auto& warn : semanticAnalyzer.getWarnings()) {
-                std::cerr << warn << std::endl;
-            }
-        }
-
-        // 4) Генерация Python кода
-        CodeGenerator codeGen(&semanticAnalyzer);
-        std::string pythonCode = codeGen.generate(program.get());
-        
-        // Вывод с информацией об источнике
-        std::cout << "\n========================================" << std::endl;
-        std::cout << "  C to Python Code Translator" << std::endl;
-        std::cout << "========================================" << std::endl;
-        std::cout << "\nSource: " << sourceInfo << std::endl;
-        std::cout << "\n----------------------------------------" << std::endl;
-        std::cout << "Generated Python Code:" << std::endl;
-        std::cout << "----------------------------------------\n" << std::endl;
-        std::cout << pythonCode << std::endl;
-        std::cout << "----------------------------------------" << std::endl;
-
-        return 0;
-    } catch (const std::exception& ex) {
-        std::cerr << "Error: " << ex.what() << std::endl;
-        return 1;
-    }
+    window->show(argc, argv);
+    return Fl::run();
 }

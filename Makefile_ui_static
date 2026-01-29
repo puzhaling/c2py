@@ -1,0 +1,22 @@
+CXX      := c++
+CXXFLAGS := -Iinclude -Isrc -Wall -Wextra `fltk-config --cxxflags`
+LDFLAGS  := -s -static-libgcc -static-libstdc++ -static `fltk-config --ldflags --use-images`
+
+BUILD_DIR := build
+TARGET   := $(BUILD_DIR)/c2py.exe
+
+SRCS := src/expr_translator.cpp src/lexer.cpp src/parser.cpp src/ast.cpp \
+        src/code_generator.cpp src/semantic.cpp src/symbol_table.cc \
+        src/gui.cxx src/main.cpp
+        
+
+all: $(TARGET)
+
+$(TARGET): $(SRCS)
+	@mkdir -p $(BUILD_DIR)
+	$(CXX) $(SRCS) $(CXXFLAGS) $(LDFLAGS) -o $(TARGET)
+
+clean:
+	rm -rf $(BUILD_DIR)
+
+.PHONY: all clean
